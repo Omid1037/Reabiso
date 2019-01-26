@@ -3,11 +3,14 @@
 
 unsigned char Pic[2000][2000][3];
 unsigned char SecPic[2000][2000][3];
+unsigned char Sec2Pic[2000][2000][3];
 int CutRight(int height,int width);
 int CutLeft(int height,int width,int ny);
 int CutUp(int height,int width,int ny,int ny2);
 int CutBottom(int height,int width,int ny,int ny2,int nx);
 void DrawPic(int nx, int nx2,int ny, int ny2);
+void RsizVertical(int height,float RatioH);
+int ResizHorizontal(int height,float RatioW,int width);
 int main()
 {
 	int  nx,nx2, ny,ny2;
@@ -33,7 +36,31 @@ int main()
 	========================================
 	*/
 
+
+    /*
+    =======================================
+    			START-RESIZ
+	=======================================
+    */
+    float RatioW,RatioH , h = 0 ;
+	int i , j , k , z=0 ;
+    RatioW = 500.00 / (float) width ;
+    RatioH = 500.00 / (float) height ;
+
+    ResizHorizontal(height,RatioW,width);    
+	RsizVertical(height,RatioH);
+
+	
+    saveBMP(SecPic,500,500,"RESIZ.bmp");
+    /*
+    =======================================
+    			END-RESIZ
+	=======================================
+    */
 }
+
+
+
 int CutRight(int height,int width){
     int count;
     int j,i;
@@ -109,5 +136,76 @@ void DrawPic(int nx, int nx2,int ny, int ny2){
 			}
 		}
 	}
-	saveBMP(SecPic,ny2-ny,nx2-nx,"OFCP12.bmp");
+	saveBMP(SecPic,ny2-ny,nx2-nx,"CROP.bmp");
+}
+int ResizHorizontal(int height,float RatioW,int width){
+ int i,z,j,k,h,h2;
+ for(i=0 ; i<height ; i++) {
+    	z=0 ;
+    	h = RatioW - (int) RatioW ;
+    	float h2 = 0 ; 
+    	for(j=0 ; j<width ; j++) {
+			if (z!=0 && (j&1)) { 
+				SecPic[i][z][0] = h * (float) Pic[i][j-1][0] + (1.0-h) * (float) Pic[i][j][0] ; 
+				SecPic[i][z][1] = h * (float) Pic[i][j-1][1] + (1.0-h) * (float) Pic[i][j][1] ; 
+				SecPic[i][z][2] = h * (float) Pic[i][j-1][2] + (1.0-h) * (float) Pic[i][j][2] ;	
+			} 
+			else if (z!=0 && !(j&1)) { 
+				SecPic[i][z][0] = h*(float)Pic[i][j][0] + (1.0-h)*(float)Pic[i][j-1][0] ; 
+				SecPic[i][z][1] = h*(float)Pic[i][j][1] + (1.0-h)*(float)Pic[i][j-1][1] ; 
+				SecPic[i][z][2] = h*(float)Pic[i][j][2] + (1.0-h)*(float)Pic[i][j-1][2] ; 	
+			}
+			h2 += h ; 
+			if (h2>=1) {
+				z++ ; 
+				h2 -= 1 ; 
+			} 
+			for (k=z ; k < z + (int) RatioW ; k++) {
+				SecPic[i][k][0] = Pic[i][j][0] ;
+				SecPic[i][k][1] = Pic[i][j][1] ;
+				SecPic[i][k][2] = Pic[i][j][2] ;
+			}
+			z += (int) RatioW ;
+		} 
+	}
+}
+void RsizVertical(int height,float RatioH){
+	int i,j,z,k;
+	float h,h1;
+	for (i=0 ; i<height ; i++) {
+		for (j=0 ; j<500 ; j++) {
+			Sec2Pic[i][j][0] = SecPic[i][j][0] ; 
+			Sec2Pic[i][j][1] = SecPic[i][j][1] ; 
+			Sec2Pic[i][j][2] = SecPic[i][j][2] ; 
+		}
+	}
+	
+	for(i=0 ; i<500 ; i++) {
+    	z=0 ;
+    	h = RatioH - (int) RatioH ;
+    	float h2 = 0 ; 
+    	for(j=0 ; j<height ; j++) {
+			if (z!=0 && (j&1)) { 
+				SecPic[z][i][0] = h * (float) Sec2Pic[j-1][i][0] + (1.0-h) * (float) Sec2Pic[j][i][0] ; 
+				SecPic[z][i][1] = h * (float) Sec2Pic[j-1][i][1] + (1.0-h) * (float) Sec2Pic[j][i][1] ; 
+				SecPic[z][i][2] = h * (float) Sec2Pic[j-1][i][2] + (1.0-h) * (float) Sec2Pic[j][i][2] ;	
+			} 
+			else if (z!=0 && !(j&1)) { 
+				SecPic[z][i][0] = h*(float)Sec2Pic[j][i][0] + (1.0-h)*(float)Sec2Pic[j-1][i][0] ; 
+				SecPic[z][i][1] = h*(float)Sec2Pic[j][i][1] + (1.0-h)*(float)Sec2Pic[j-1][i][1] ; 
+				SecPic[z][i][2] = h*(float)Sec2Pic[j][i][2] + (1.0-h)*(float)Sec2Pic[j-1][i][2] ; 	
+			}
+			h2 += h ; 
+			if (h2>=1) {
+				z++ ; 
+				h2 -= 1 ; 
+			}
+			for (k=z ; k < z + (int) RatioH ; k++) {
+				SecPic[k][i][0] = Sec2Pic[j][i][0] ;
+				SecPic[k][i][1] = Sec2Pic[j][i][1] ;
+				SecPic[k][i][2] = Sec2Pic[j][i][2] ;
+			}
+			z += (int) RatioH ;
+		} 
+	}
 }
