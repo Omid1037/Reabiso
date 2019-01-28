@@ -94,7 +94,7 @@ int main()
 	for(ii=0;ii<500;ii++){
 		for(jj=0;jj<500;jj++){
 			for(kk=0;kk<=2;kk++){	
-				SecPic[ii][jj][kk]=((double)SecPic[ii][jj][kk]+((double)Pic[ii][jj][kk])/32);
+				SecPic[ii][jj][kk]=((double)SecPic[ii][jj][kk]+((double)Pic[ii][jj][kk])/number);
 			}	
 		}
 	}   
@@ -236,7 +236,6 @@ int ResizHorizontal(int height,float RatioW,int width){
 				SecPic[i][z][2] = h*(float)Pic[i][j][2] + (1.0-h)*(float)Pic[i][j-1][2] ; 	
 			}
 			(int)SecPic[i][j][0],SecPic[i][j][1],SecPic[i][j][2];
-			printf("%d %d %d /n",SecPic[i][j][0],SecPic[i][j][1],SecPic[i][j][2]);
 			h2 += h ; 
 			if (h2>=1) {
 				z++ ; 
