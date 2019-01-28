@@ -4,6 +4,7 @@
 unsigned char Pic[2000][2000][3];
 unsigned char SecPic[2000][2000][3];
 unsigned char Sec2Pic[2000][2000][3];
+int NOF(char name);
 int CutRight(int height,int width);
 int CutLeft(int height,int width,int ny);
 int CutUp(int height,int width,int ny,int ny2);
@@ -13,43 +14,46 @@ void RsizVertical(int height,float RatioH);
 int ResizHorizontal(int height,float RatioW,int width);
 int main()
 {
-	int  nx,nx2, ny,ny2,n,ii,jj,kk;
+	int  nx,nx2, ny,ny2,n,ii,jj,kk,zz,number;
+	char name;
 	char p[100];
-	gets(p);
 	int width, height;
-	for(ii=1;ii<=32;ii++){
-	
-	sprintf(p,"D:/DataSet/A/%d.bmp",ii);
-	readBMP(p, &width, &height, Pic);
+	scanf("%c",&name);
     
     /*
     =======================================
     			START-CROP
 	=======================================
     */
+    number=0;
+    number=NOF(name);
+    for(ii=1;ii<=number;ii++){
+	sprintf(p,"D:/DataSet/%c/%d.bmp",name,ii);
+	readBMP(p, &width, &height, Pic);
+	
 	ny=CutRight(height, width);
 	ny2=CutLeft(height, width,ny);
 	nx=CutUp(height,width,ny,ny2);
 	nx2=CutBottom(height,width,ny,ny2,nx);
     DrawPic(nx,nx2,ny,ny2);
-    sprintf(p,"D:/DataSet/A/Crop%d.bmp",ii);
+    sprintf(p,"D:/DataSet/%c/Crop%d.bmp",name,ii);
 	saveBMP(SecPic,ny2-ny,nx2-nx,p);
-
+}
 	/*
 	========================================
 				END-CROP
 	========================================
 	*/
-	}
+
 
     /*
     =======================================
     			START-RESIZ
 	=======================================
     */
-	for(ii=1;ii<=32;ii++){
+	for(ii=1;ii<=number;ii++){
 	
-	sprintf(p,"D:/DataSet/A/Crop%d.bmp",ii);
+	sprintf(p,"D:/DataSet/%c/Crop%d.bmp",name,ii);
 	readBMP(p, &width, &height, Pic);
 	
 	float RatioW,RatioH , h = 0 ;
@@ -60,19 +64,83 @@ int main()
     ResizHorizontal(height,RatioW,width);    
 	RsizVertical(height,RatioH);
 
-	sprintf(p,"D:/DataSet/A/Resiz%d.bmp",ii);
+	sprintf(p,"D:/DataSet/%c/Resiz%d.bmp",name,ii);
     saveBMP(SecPic,500,500,p);
 
-    /*
+}
+	/*
     =======================================
     			END-RESIZ
 	=======================================
     */
     
+    
+    /*
+    =======================================
+    			START-AVRAGE
+	=======================================
+    */
+       
+    for(ii=0;ii<500;ii++){
+    	for(jj=0;jj<500;jj++){
+    		for(kk=0;kk<500;kk++)
+    		SecPic[ii][jj][kk]=0;
+		}
+	}
+     for(zz=1;zz<=number;zz++){
+	
+	sprintf(p,"D:/DataSet/%c/Resiz%d.bmp",name,zz);
+	readBMP(p, &width, &height, Pic);
+	for(ii=0;ii<500;ii++){
+		for(jj=0;jj<500;jj++){
+			for(kk=0;kk<=2;kk++){	
+				SecPic[ii][jj][kk]=((double)SecPic[ii][jj][kk]+((double)Pic[ii][jj][kk])/32);
+			}	
+		}
+	}   
 }
+sprintf(p,"D:/DataSet/%c/AV.bmp",name);
+saveBMP(SecPic,500,500,p);
+
+	/*
+    =======================================
+    			END-AVRAGE
+	=======================================
+    */
+    
+    
+
 }
-
-
+int NOF(char name){
+	int Number=0;
+	switch(name){
+		case 'A':
+			Number=32;
+			break;
+		case 'B':
+			Number=41;
+			break;
+		case 'C':
+			Number=32;
+			break;
+		case 'I':
+			Number=15;
+			break;
+		case 'O':
+			Number=25;
+			break;
+		case 'R':
+			Number=17;
+			break;
+		case 'S':
+			Number=20;
+			break;
+		case 'E':
+			Number=32;
+			break;
+	}
+	return Number;
+}
 int CutRight(int height,int width){
     int count;
     int j,i;
@@ -167,6 +235,8 @@ int ResizHorizontal(int height,float RatioW,int width){
 				SecPic[i][z][1] = h*(float)Pic[i][j][1] + (1.0-h)*(float)Pic[i][j-1][1] ; 
 				SecPic[i][z][2] = h*(float)Pic[i][j][2] + (1.0-h)*(float)Pic[i][j-1][2] ; 	
 			}
+			(int)SecPic[i][j][0],SecPic[i][j][1],SecPic[i][j][2];
+			printf("%d %d %d /n",SecPic[i][j][0],SecPic[i][j][1],SecPic[i][j][2]);
 			h2 += h ; 
 			if (h2>=1) {
 				z++ ; 
