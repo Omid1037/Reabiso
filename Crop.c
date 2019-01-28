@@ -4,6 +4,7 @@
 unsigned char Pic[2000][2000][3];
 unsigned char SecPic[2000][2000][3];
 unsigned char Sec2Pic[2000][2000][3];
+void FullCrop(char p,int width,int height);
 int NOF(char name);
 int CutRight(int height,int width);
 int CutLeft(int height,int width,int ny);
@@ -99,8 +100,8 @@ int main()
 		}
 	}   
 }
-sprintf(p,"D:/DataSet/%c/AV.bmp",name);
-saveBMP(SecPic,500,500,p);
+    sprintf(p,"D:/DataSet/%c/%cAV.bmp",name,name);
+    saveBMP(SecPic,500,500,p);
 
 	/*
     =======================================
@@ -108,7 +109,54 @@ saveBMP(SecPic,500,500,p);
 	=======================================
     */
     
+    sprintf(p,"D:/DataSet/word/1.bmp");
+	readBMP(p, &width, &height, Pic);
+    ny=CutRight(height, width);
+	ny2=CutLeft(height, width,ny);
+	nx=CutUp(height,width,ny,ny2);
+	nx2=CutBottom(height,width,ny,ny2,nx);
+    DrawPic(nx,nx2,ny,ny2);
+    sprintf(p,"D:/DataSet/Word/Crop1.bmp");
+    saveBMP(SecPic,ny2-ny,nx2-nx,p);	
     
+	
+	sprintf(p,"D:/DataSet/word/Crop1.bmp");
+	readBMP(p, &width, &height, Pic);
+    float RatioW,RatioH , h = 0 ;
+	int i , j , k , z=0 ;
+    RatioW = 500.00 / (float) width ;
+    RatioH = 500.00 / (float) height ;
+    ResizHorizontal(height,RatioW,width);    
+	RsizVertical(height,RatioH);
+	sprintf(p,"D:/DataSet/word/Resiz1.bmp");
+    saveBMP(SecPic,500,500,p);
+    
+    double sum[7]={0,0,0,0,0,0,0};
+    for(zz=1;zz<=7;zz++){
+	
+	sprintf(p,"D:/DataSet/Avrage/%dAV.bmp",zz);
+	readBMP(p, &width, &height, Pic);
+	for(ii=0;ii<500;ii++){
+		for(jj=0;jj<500;jj++){
+			for(kk=0;kk<=2;kk++){	
+				if(SecPic[ii][jj][kk]==0){
+				sum[zz-1]=((double)Pic[ii][jj][kk]-(double)SecPic[ii][jj][kk])+sum[zz-1];
+		 }
+			}
+				
+		}
+}
+	
+}  
+    double min=sum[0];
+	int min2=1;
+    for(zz=1;zz<7;zz++){
+    	if(sum[zz]<min){
+    		min=sum[zz];
+			min2=zz+1;
+		}
+	}
+   	printf("%d",min2);
 
 }
 int NOF(char name){
@@ -216,7 +264,6 @@ void DrawPic(int nx, int nx2,int ny, int ny2){
 			}
 		}
 	}
-	saveBMP(SecPic,ny2-ny,nx2-nx,"CROP.bmp");
 }
 int ResizHorizontal(int height,float RatioW,int width){
  int i,z,j,k,h,h2;
@@ -290,3 +337,4 @@ void RsizVertical(int height,float RatioH){
 		} 
 	}
 }
+
