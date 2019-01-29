@@ -6,16 +6,16 @@ unsigned char SecPic[2000][2000][3];
 unsigned char Sec2Pic[2000][2000][3];
 void FullCrop(char p,int width,int height);
 int NOF(char name);
-int CutRight(int height,int width);
+int CutRight(int height,int width,int first);
 int CutLeft(int height,int width,int ny);
-int CutUp(int height,int width,int ny,int ny2);
+int CutUp(int height,int width,int ny,int ny2,int firstx);
 int CutBottom(int height,int width,int ny,int ny2,int nx);
 void DrawPic(int nx, int nx2,int ny, int ny2);
 void RsizVertical(int height,float RatioH);
 int ResizHorizontal(int height,float RatioW,int width);
 int main()
 {
-	int  nx,nx2, ny,ny2,n,ii,jj,kk,zz,number;
+	int  nx,nx2, ny,ny2,n,ii,jj,kk,zz,number,first,firstx;
 	char name;
 	char p[100];
 	int width, height;
@@ -31,10 +31,11 @@ int main()
     for(ii=1;ii<=number;ii++){
 	sprintf(p,"D:/DataSet/%c/%d.bmp",name,ii);
 	readBMP(p, &width, &height, Pic);
-	
-	ny=CutRight(height, width);
+	first=0;
+	firstx=0;
+	ny=CutRight(height, width,first);
 	ny2=CutLeft(height, width,ny);
-	nx=CutUp(height,width,ny,ny2);
+	nx=CutUp(height,width,ny,ny2,firstx);
 	nx2=CutBottom(height,width,ny,ny2,nx);
     DrawPic(nx,nx2,ny,ny2);
     sprintf(p,"D:/DataSet/%c/Crop%d.bmp",name,ii);
@@ -109,11 +110,20 @@ int main()
 	=======================================
     */
     
+	
+	/*
+    =======================================
+    			START-Detect the letter
+	=======================================
+    */    
+    
     sprintf(p,"D:/DataSet/word/1.bmp");
 	readBMP(p, &width, &height, Pic);
-    ny=CutRight(height, width);
+    first=0;
+	ny=CutRight(height, width,first);
 	ny2=CutLeft(height, width,ny);
-	nx=CutUp(height,width,ny,ny2);
+	firstx=0;
+	nx=CutUp(height,width,ny,ny2,firstx);
 	nx2=CutBottom(height,width,ny,ny2,nx);
     DrawPic(nx,nx2,ny,ny2);
     sprintf(p,"D:/DataSet/Word/Crop1.bmp");
@@ -141,12 +151,11 @@ int main()
 			for(kk=0;kk<=2;kk++){	
 				if(SecPic[ii][jj][kk]==0){
 				sum[zz-1]=((double)Pic[ii][jj][kk]-(double)SecPic[ii][jj][kk])+sum[zz-1];
-		 }
-			}
+		    }
+	    }
 				
-		}
-}
-	
+	}
+  }  	
 }  
     double min=sum[0];
 	int min2=1;
@@ -157,8 +166,75 @@ int main()
 		}
 	}
    	printf("%d",min2);
+   	
+   	/*
+    =======================================
+    			END-Detect the letter
+	=======================================
+    */
+    
+    int lineV[20],lineH[20],i4,j4;
+    lineV[0]=0;
+    lineH[0]=0;
+    sprintf(p,"D:/DataSet/jadval/1.bmp");
+	readBMP(p, &width, &height, Pic);
+	int j3=0;
+	first=0;
+    while(ny<=width-1){
+	ny=CutRight(height,width,first);
+	j3++;
+	lineV[j3]=ny;
+    ny2=CutLeft(height,width,ny);
+    j3++;
+    lineV[j3]=ny2;
+    first=ny2+1;
+}
+    j3=j3;
+    
+	int i3=0;
+	first=0;
+    while(nx<=height-1){
+	nx=CutUp(height,width,first,width-1,firstx);
+	i3++;
+	lineH[i3]=nx;
+    nx2=CutBottom(height,width,first,width-1,nx);
+    i3++;
+    lineH[i3]=nx2;
+    firstx=nx2+1;
+}
+    i3=i3;    
+	int z5=0;
+    for(i4=0;i4<8;i4++){
+    	i4++;
+    	for(j4=0;j4<8;j4++){
+    		j4++;
+    DrawPic(lineH[i4], lineH[i4+2], lineV[j4], lineV[j4+2]);
+    z5++;
+    sprintf(p,"D:/DataSet/jadval/Crop%d.bmp",z5);
+	saveBMP(SecPic,lineV[j4+2]-lineV[j4],lineH[i4+2]-lineH[i4],p);
+  }
+}
+    int z6;
+    for(z6=1;z6<=z5;z6++){
+    sprintf(p,"D:/DataSet/jadval/Crop%d.bmp",z6);
+	readBMP(p, &width, &height, Pic);
+	first=0;
+	firstx=0;
+	ny=CutRight(height, width,first);
+	ny2=CutLeft(height, width,ny);
+	nx=CutUp(height,width,ny,ny2,firstx);
+	nx2=CutBottom(height,width,ny,ny2,nx);
+    DrawPic(nx,nx2,ny,ny2);
+    sprintf(p,"D:/DataSet/jadval/Cropp%d.bmp",z6);
+	saveBMP(SecPic,ny2-ny,nx2-nx,p);
+}
+    for(z6=1;z6<=z5;z6++){
+	sprintf(p,"D:/DataSet/jadval/Cropp%d.bmp",z6);
+	readBMP(p, &width, &height, Pic);
+    
 
 }
+
 int NOF(char name){
 	int Number=0;
 	switch(name){
@@ -189,10 +265,10 @@ int NOF(char name){
 	}
 	return Number;
 }
-int CutRight(int height,int width){
+int CutRight(int height,int width,int first){
     int count;
     int j,i;
-	for(j=0;j<=(width-1) ;j++){
+	for(j=first;j<=(width-1) ;j++){
 		count=0;
 		for(i=0;i<=(height-1);i++){
 			if(Pic[i][j][0]!=255 || Pic[i][j][1]!=255 || Pic[i][j][2]!=255){
@@ -221,10 +297,10 @@ int CutLeft(int height,int width,int ny){
 	}
 	return j-1;
 }
-int CutUp(int height,int width,int ny,int ny2){
+int CutUp(int height,int width,int ny,int ny2,int firstx){
     int count;
     int j,i;
-	for(i=0;i<=(height-1) ;i++){
+	for(i=firstx;i<=(height-1) ;i++){
 		count=0;
 		for(j=ny;j<=ny2;j++){
 			if(Pic[i][j][0]!=255 || Pic[i][j][1]!=255 || Pic[i][j][2]!=255)
