@@ -4,6 +4,7 @@
 unsigned char Pic[2000][2000][3];
 unsigned char SecPic[2000][2000][3];
 unsigned char Sec2Pic[2000][2000][3];
+
 void FullCrop(char p,int width,int height);
 int NOF(char name);
 int CutRight(int height,int width,int first);
@@ -13,6 +14,9 @@ int CutBottom(int height,int width,int ny,int ny2,int nx);
 void DrawPic(int nx, int nx2,int ny, int ny2);
 void RsizVertical(int height,float RatioH);
 int ResizHorizontal(int height,float RatioW,int width);
+char ShowTheLetter(int min2);
+
+
 int main()
 {
 	int  nx,nx2, ny,ny2,n,ii,jj,kk,zz,number,first,firstx;
@@ -26,17 +30,17 @@ int main()
     			START-CROP
 	=======================================
     */
-    number=0;
-    number=NOF(name);
+    number = 0;
+    number = NOF(name);
     for(ii=1;ii<=number;ii++){
 	sprintf(p,"D:/DataSet/%c/%d.bmp",name,ii);
 	readBMP(p, &width, &height, Pic);
 	first=0;
 	firstx=0;
-	ny=CutRight(height, width,first);
-	ny2=CutLeft(height, width,ny);
-	nx=CutUp(height,width,ny,ny2,firstx);
-	nx2=CutBottom(height,width,ny,ny2,nx);
+	ny = CutRight(height, width, first);
+	ny2 = CutLeft(height, width, ny);
+	nx = CutUp(height, width, ny, ny2, firstx);
+	nx2 = CutBottom(height, width, ny, ny2, nx);
     DrawPic(nx,nx2,ny,ny2);
     sprintf(p,"D:/DataSet/%c/Crop%d.bmp",name,ii);
 	saveBMP(SecPic,ny2-ny,nx2-nx,p);
@@ -165,26 +169,28 @@ int main()
 			min2=zz+1;
 		}
 	}
-   	printf("%d",min2);
-   	
+	char namee;
+   	namee=ShowTheLetter(min2);
+   	printf("%c",namee);
    	/*
     =======================================
     			END-Detect the letter
 	=======================================
     */
     
-    /*
+    
+	/*
     =======================================
     			START-Create Letter Table
 	=======================================
     */    
     
-    int lineV[20],lineH[20],i4,j4;
+    int lineV[20],lineH[20],i4,j4; 
     lineV[0]=0;
     lineH[0]=0;
-    sprintf(p,"D:/DataSet/jadval/1.bmp");
+    sprintf(p,"D:/DataSet/jadval/1.bmp"); 
 	readBMP(p, &width, &height, Pic);
-	int j3=0;
+	int j3=0;                                        //END-Number Of Columns
 	first=0;
     while(ny<=width-1){
 	ny=CutRight(height,width,first);
@@ -195,9 +201,9 @@ int main()
     lineV[j3]=ny2;
     first=ny2+1;
 }
-    j3=j3;
+    j3=j3-2;                                           //END-Number Of Columns
     
-	int i3=0;
+	int i3=0;                                        //START-Number Of Rows
 	first=0;
     while(nx<=height-1){
 	nx=CutUp(height,width,first,width-1,firstx);
@@ -208,19 +214,21 @@ int main()
     lineH[i3]=nx2;
     firstx=nx2+1;
 }
-    i3=i3;    
-	int z5=0;
-    for(i4=0;i4<8;i4++){
+    i3=i3-2;                                            //END-Number Of Rows
+	
+	int z5=0;                                        //START-Parsing Table Of Letters
+    for(i4=0;i4<i3;i4++){
     	i4++;
-    	for(j4=0;j4<8;j4++){
+    	for(j4=0;j4<j3;j4++){
     		j4++;
     DrawPic(lineH[i4], lineH[i4+2], lineV[j4], lineV[j4+2]);
     z5++;
     sprintf(p,"D:/DataSet/jadval/Crop%d.bmp",z5);
-	saveBMP(SecPic,lineV[j4+2]-lineV[j4],lineH[i4+2]-lineH[i4],p);
+	saveBMP(SecPic,lineV[j4+2]-lineV[j4],lineH[i4+2]-lineH[i4],p); 
   }
-}
-    int z6;
+}                                                     //END-Parsing Table Of Letters
+
+    int z6;                                          //START-CROP
     for(z6=1;z6<=z5;z6++){
     sprintf(p,"D:/DataSet/jadval/Crop%d.bmp",z6);
 	readBMP(p, &width, &height, Pic);
@@ -233,8 +241,9 @@ int main()
     DrawPic(nx,nx2,ny,ny2);
     sprintf(p,"D:/DataSet/jadval/Cropp%d.bmp",z6);
 	saveBMP(SecPic,ny2-ny,nx2-nx,p);
-}
-    for(z6=1;z6<=z5;z6++){
+}                                                   //END-CROP
+ 
+    for(z6=1;z6<=z5;z6++){                         //START-RESIZ
 	sprintf(p,"D:/DataSet/jadval/Cropp%d.bmp",z6);
 	readBMP(p, &width, &height, Pic);
     float RatioW,RatioH , h = 0 ;
@@ -247,8 +256,11 @@ int main()
 
 	sprintf(p,"D:/DataSet/jadval/Resiz%d.bmp",z6);
     saveBMP(SecPic,500,500,p);
-}
-	for(z6=1;z6<=16;z6++){
+}                                                   //END-RESIZ
+
+    int s,s1,s2=0; 
+    char number2[z5] , Name2[i3/2][j3/2];
+	for(z6=1;z6<=z5;z6++){                         //START-Create Letter Table
     sprintf(p,"D:/DataSet/jadval/Resiz%d.bmp",z6);
 	readBMP(p, &width, &height, SecPic);    
     double sum2[7]={0,0,0,0,0,0,0};
@@ -268,13 +280,29 @@ int main()
      min=sum2[0];
 	 min2=1;
     for(zz=1;zz<7;zz++){
-    	if(sum2[zz]<min){
+    	if(sum2[zz]<=min){
     		min=sum2[zz];
 			min2=zz+1;
+		}	
+	}
+	number2[s2]=ShowTheLetter(min2);
+	s2++;
+	   }
+	   s2=0;
+    for(s=0;s<i3/2;s++){
+		for(s1=0;s1<j3/2;s1++){	
+		Name2[s][s1]=number2[s2];
+		s2++;
 		}
 	}
-   	printf("%d++++",min2);
-   }
+   	for(s=0;s<i3/2;s++){
+		printf("\n");
+		for(s1=0;s1<j3/2;s1++){
+		printf("%c",Name2[s][s1]);
+        printf("\t");
+		}
+	}                                                          //END-Create Letter Table
+	   
      /*
     =======================================
     			END-Create Letter Table
@@ -462,4 +490,30 @@ void RsizVertical(int height,float RatioH){
 		} 
 	}
 }
-
+char ShowTheLetter(int min2){
+	char name;
+	switch(min2){
+		case 1:
+			name='A';
+			break;
+		case 2:
+			name='B';
+			break;	
+		case 3:
+			name='E';
+			break;	
+		case 4:
+			name='I';
+			break;	
+		case 5:
+			name='O';
+			break;	
+		case 6:
+			name='R';
+			break;	
+		case 7:
+			name='S';
+			break;		
+	}
+	return name;
+}
