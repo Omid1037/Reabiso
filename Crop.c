@@ -173,6 +173,12 @@ int main()
 	=======================================
     */
     
+    /*
+    =======================================
+    			START-Create Letter Table
+	=======================================
+    */    
+    
     int lineV[20],lineH[20],i4,j4;
     lineV[0]=0;
     lineH[0]=0;
@@ -231,10 +237,53 @@ int main()
     for(z6=1;z6<=z5;z6++){
 	sprintf(p,"D:/DataSet/jadval/Cropp%d.bmp",z6);
 	readBMP(p, &width, &height, Pic);
-    
+    float RatioW,RatioH , h = 0 ;
+	int i , j , k , z=0 ;
+    RatioW = 500.00 / (float) width ;
+    RatioH = 500.00 / (float) height ;
 
+    ResizHorizontal(height,RatioW,width);    
+	RsizVertical(height,RatioH);
+
+	sprintf(p,"D:/DataSet/jadval/Resiz%d.bmp",z6);
+    saveBMP(SecPic,500,500,p);
 }
+	for(z6=1;z6<=16;z6++){
+    sprintf(p,"D:/DataSet/jadval/Resiz%d.bmp",z6);
+	readBMP(p, &width, &height, SecPic);    
+    double sum2[7]={0,0,0,0,0,0,0};
+    for(zz=1;zz<=7;zz++){
+	sprintf(p,"D:/DataSet/Avrage/%dAV.bmp",zz);
+	readBMP(p, &width, &height, Pic);
+	for(ii=0;ii<500;ii++){
+		for(jj=0;jj<500;jj++){
+			for(kk=0;kk<=2;kk++){	
+				if(SecPic[ii][jj][kk]==0){
+				sum2[zz-1]=((double)Pic[ii][jj][kk]-(double)SecPic[ii][jj][kk])+sum2[zz-1];
+           }
+         }
+        }
+       }
+     }
+     min=sum2[0];
+	 min2=1;
+    for(zz=1;zz<7;zz++){
+    	if(sum2[zz]<min){
+    		min=sum2[zz];
+			min2=zz+1;
+		}
+	}
+   	printf("%d++++",min2);
+   }
+     /*
+    =======================================
+    			END-Create Letter Table
+	=======================================
+    */    
+       
+   
 
+  }
 int NOF(char name){
 	int Number=0;
 	switch(name){
